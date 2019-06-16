@@ -24,8 +24,10 @@ this.pubnub = new PubNubReact({
       subscribeKey: "your key",
  });
 ```
+and run two simulator for testing
 ```sh
-react native run-android or run-ios
+react-native run-android  
+react-native run-ios
 ```
 
 ## Run tests
