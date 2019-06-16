@@ -1,7 +1,8 @@
 <h1 align="center">Welcome to Pubnub React native Chat app 👋</h1>
+<img src="https://i.imgur.com/DTAgxdN.gif" />
 <p>
   <img src="https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000" />
-  <a href="https://twitter.com/@reactninja">
+  <a href="https://twitter.com/@krissanawat101">
     <img alt="Twitter: @krissanawat101" src="https://img.shields.io/twitter/follow/@reactninja.svg?style=social" target="_blank" />
   </a>
 </p>
