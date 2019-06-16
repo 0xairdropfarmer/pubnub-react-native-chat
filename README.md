@@ -37,7 +37,7 @@ npm run test
 
 👤 **Krissanawat**
 
-* Twitter: [@@reactninja](https://twitter.com/@krissanawat101)
+* Twitter: [@krissanawat101](https://twitter.com/@krissanawat101)
 * Github: [@krisanawat](https://github.com/krissnawat)
 
 ## Show your support
