@@ -1,0 +1,195 @@
+.header {
+    @include size (100%);
+    position: relative;
+    border: 1px solid rgba(128, 128, 128, 0.164);
+
+    .onlineUsersInfo {
+        @include size(278px, $height:70px);
+        position: relative;
+        font-size: 17px;
+        font-weight: bold;
+        border-right: 1px solid rgba(128, 128, 128, 0.164); 
+        
+        @include breakpoint ($tablet) {
+            display: none;
+        }
+        
+        .onlineUsersLogo {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+
+            @include breakpoint ($tablet_desktop) {
+                top:20px;
+            }
+        }
+
+        .onlineUsersCount {
+            position: relative;
+            top: 14px;
+            left: 70px;
+
+            @include breakpoint ($tablet_desktop) {
+                top:20px;
+            }
+        }
+
+        span {
+            position: absolute;
+            top: 30px;
+            left: 86px;
+            color: color(secondary);
+            font-weight: normal;
+            display: block;
+
+            @include breakpoint ($tablet_desktop) {
+                top: 40px;
+            }
+        }
+
+        .onlineIndicator {
+            @include size(8px, 8px);
+            position: absolute;
+            top: 38px;
+            left: 72px;
+            border-radius: 50%;
+            background-color: rgb(12, 204, 12);     
+            
+            @include breakpoint (850px) {
+                top: 50px;
+            }
+        }
+    }
+
+    .appLogo {
+        position: absolute;
+        top: 12px;
+        left: 290px;
+
+        @include breakpoint ($tablet_desktop) {
+            top:20px;
+        }
+
+        @include breakpoint ($tablet) {
+            left: 10px;
+        }
+
+        @include breakpoint ($mobile) {
+            top: 18px;
+            left: 2px;
+        }
+    }
+
+    h1 {
+        position: absolute;
+        font-weight: bold;
+        font-size: 17px;
+        top: 2px;
+        left: 345px;
+
+        @include breakpoint ($tablet_desktop) {
+            top: 10px;
+        }
+
+        @include breakpoint ($tablet) {
+            left: 70px;
+        }
+
+        @include breakpoint ($mobile) {
+            font-size: 1em;
+            top: 5px;
+            left: 50px;
+        }
+
+        @include breakpoint ($iframe_mobile) {
+            top: 15px;
+            width: 50px;
+            font-size: 13px;
+        }
+    }
+
+    h2 {
+        font-weight: normal;
+        font-size: 15px;
+        position: absolute;
+        top: 20px;
+        left: 345px;
+
+        @include breakpoint ($tablet_desktop) {
+            top: 30px;
+            line-height: .9em;
+            width: 150px;
+        }
+
+        @include breakpoint ($tablet) {
+            width: 550px;
+            left: 70px;
+        }
+
+        @include breakpoint (586px) {
+            width: 150px;
+        }
+        
+        @include breakpoint ($mobile) {
+            width: 130px;
+            font-size: 13px;
+            top: 23px;
+            left: 50px;
+        }
+
+        @include breakpoint ($iframe_mobile) {
+            display: none;
+        }
+    }
+
+    .loggedInUser {
+        position: absolute;
+        top: 12px;
+        right: 20px;
+        color: color(secondary);
+
+        @include breakpoint ($tablet_desktop) {
+            top: 20px;
+        }
+
+        @include breakpoint ($mobile) {
+            top: 25px;
+            right: 7px;
+            font-size: 13px;
+        }
+
+        @include breakpoint ($iframe_mobile) {
+            top: 25px;
+            height: 50px;
+            letter-spacing: -1px;
+        }
+
+        @include breakpoint ($Xsmall_screens) {
+            right: 50px;
+        }
+
+        .userWelcome {
+    
+            .user {
+                display: block;
+                color: #000;
+                font-weight: bold;
+            }
+
+            @include breakpoint ($Xsmall_screens) {
+                width: 55px;
+            }
+        }
+
+
+        img {
+            position: absolute;
+            top: 0;
+            left: -50px;
+
+            @include breakpoint ($mobile) {
+                top: -5px;
+            }
+        }
+    }
+}

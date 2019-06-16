@@ -1,0 +1,54 @@
+.onlineUsers {
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    border: 1px solid rgba(128, 128, 128, 0.164);
+    border-top: unset;
+
+    @include breakpoint ($tablet) {
+        display: none;
+    }
+
+    .onlineUserList {
+        list-style: none;
+        position: relative;
+        left: -30px;
+         
+        li {
+            margin-bottom: 40px;
+            position: relative;
+
+            img {
+                position: absolute;
+                left: 0;
+            }
+
+            .userName {
+                position: relative;
+                display: inline;
+                top: 0;
+                left: 60px;
+                font-size: .9em;
+                font-weight: bold;
+
+                .youSign {
+                    position: absolute;
+                    top: 0;
+                    right: -40px;
+                    font-weight: bold;
+                }
+            }
+    
+            .designation {
+                position: absolute;
+                top: 20px;
+                left: 60px;
+                font-size: 0.9em;
+                color: color(secondary);
+            }
+
+        }
+        
+    }
+}

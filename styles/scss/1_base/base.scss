@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+    width: 100vw;
+    height: 85vh;
+    position: relative;
+    margin-bottom: 0;
+
+    @include breakpoint ($tablet_desktop) {
+        height: 81vh;
+    }
+
+    .grid {
+        display: grid;
+        width: 100%;
+        height: 90%;
+        grid-template-rows: 70px 100% 60px;
+        grid-template-columns: 280px 1fr;
+
+        @include breakpoint ($tablet_desktop) {
+            grid-template-rows: 90px 100% 60px;
+        }
+        
+        .header {
+            grid-row: 1;
+            grid-column: 1/3;
+        }
+        
+        .onlineUsers {
+            grid-row: 2/4;
+            grid-column: 1;
+        }
+        
+        .messageList {
+            grid-row: 2;
+            grid-column: 2;
+
+            @include breakpoint ($tablet) {
+                grid-column: 1/3
+            }
+        }
+        
+        .messageBody {
+            grid-row: 3;
+            grid-column: 2;
+
+            @include breakpoint ($tablet) {
+                grid-column: 1/3
+            }
+        }
+    }
+}
+
+

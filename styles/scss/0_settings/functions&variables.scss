@@ -1,0 +1,17 @@
+$colors: (
+    primary: #d32f2f,
+    secondary: grey,
+);
+
+@function color ($color_name) {
+    @return map-get($colors, $color_name);
+}
+
+$Xsmall_screens: 240px;
+$iframe_mobile: 350px;
+$mobile: 440px;
+$tablet: 770px;
+$tablet_desktop: 850px;
+$desktop: 1024px;
+$large_screens: 2000px;
+$Xlarge_screens: 3000px;

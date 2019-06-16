@@ -1,0 +1,158 @@
+.messageBody {
+    position: relative;
+
+    .messageForm {
+        @include size(100%);
+        position: absolute;
+        left: 5px;
+        bottom: 12px;
+
+        @include breakpoint ($mobile) {
+            bottom: 10px;
+        }
+        
+        .messageInput {
+            @include size (82%, 35px); 
+            margin-top: 30px;
+            border: none;
+            font-size: 15px;
+
+            &:focus {
+                outline: none;
+            }
+
+            @include breakpoint ($desktop) {
+                width: 75%;
+            }
+            
+            @include breakpoint ($tablet) {
+                width: 75%;
+                margin-left: 5px;
+            }
+
+            @include breakpoint (500px) {
+                width: 72%;
+            }
+            
+            @include breakpoint ($mobile) {
+                width: 60%;
+            }
+
+            @include breakpoint ($Xsmall_screens) {
+                width: 47%;
+            }
+        }
+
+        .emojiIcon {
+            position: relative;
+            top: 8px;
+            right: 10px;
+            cursor: pointer;
+
+            @include breakpoint ($Xlarge_screens) {
+                right: -100px;
+            }
+
+            @include breakpoint ($large_screens) {
+                right: -30px;
+            }
+
+            @include breakpoint (1300px) {
+                right: 0;
+            }
+
+            @include breakpoint ($desktop) {
+                right: -2px;
+            }
+
+            @include breakpoint ($tablet) {
+                right: -5px;
+            }
+        }
+
+        .emojisWindow {
+            @include size(250px, 200px);
+            position: absolute;
+            right: 30px;
+            top: -135px;
+            background-color: white;
+
+            @include breakpoint ($desktop) {
+                right: 10px;
+            }
+
+            @include breakpoint ($mobile) {
+                width: 220px;
+            }
+
+            .emoji {
+                margin: 1px 6px -1px 7px;
+                cursor: pointer;
+
+                @include breakpoint ($mobile) {
+                    margin: 1px 3px 0 5px;
+                }
+            }
+
+            .closeBtn {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                background-color: unset;
+                border: none;
+                color: color(secondary);
+                font-size: 1.1em;
+                cursor: pointer;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+        
+        .submitBtn {
+            @include size (12%, 30px);
+            background-color: color(primary);
+            border: 1px solid color(primary);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            position: absolute;
+            top: 35px;
+            right: 38px;
+            z-index: 1;
+            cursor: pointer;
+
+            &:focus {
+                outline: none;
+            }
+
+            @include breakpoint ($Xlarge_screens) {
+                width: 5%;
+            }
+
+            @include breakpoint ($large_screens) {
+                width: 9%;
+            }
+
+            @include breakpoint ($desktop) {
+                width: 15%;
+                right: 22px;
+            }
+
+            @include breakpoint ($tablet) {
+                width: 12%;
+            }
+
+            @include breakpoint ($mobile) {
+                width: 18%;
+                padding-left: 1px;
+                padding-right: 2px;
+            }
+
+            @include breakpoint ($Xsmall_screens) {
+                right: 60px;
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+@mixin size ($width, $height: null, $min-height: null) {
+    width: $width;
+    height: $height;
+    min-height: $min-height
+}
+
+@mixin breakpoint ($point) {
+    @media (max-width: $point) {
+        @content;
+    }
+}
