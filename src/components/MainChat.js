@@ -20,8 +20,8 @@ export default class MainChat extends Component {
     };
     this.id = this.randomid();
     this.pubnub = new PubNubReact({
-      publishKey: "pub-c-5b74ec65-efe0-4be6-xxxx-xxxx",
-      subscribeKey: "sub-c-3f6e41aa-8609-11e9-xxxx-xxxxx"
+      publishKey: "pub-c-5b74ec65-efe0-4be6-95f9-96b8167d7588",
+      subscribeKey: "sub-c-3f6e41aa-8609-11e9-98ee-ee7e7bd32b12"
     });
     this.pubnub.init(this);
   }
