@@ -10,7 +10,7 @@ import PubNubReact from "pubnub-react";
 import React, { Component } from "react";
 import { StyleSheet, Image, Button, FlatList, Text, View } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
-const RoomName = "MainChat1";
+const RoomName = "MainChat";
 export default class MainChat extends Component {
   constructor(props) {
     super(props);
