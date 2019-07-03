@@ -10,7 +10,7 @@ import PubNubReact from "pubnub-react";
 import React, { Component } from "react";
 import { StyleSheet, Image, Button, FlatList, Text, View } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
-const RoomName = "MainChat";
+const RoomName = "MainChat1";
 export default class MainChat extends Component {
   constructor(props) {
     super(props);
@@ -50,6 +50,7 @@ export default class MainChat extends Component {
     this.pubnub.history(
       { channel: RoomName, reverse: true, count: 15 },
       (status, res) => {
+        console.log(res);
         let newmessage = [];
         res.messages.forEach(function(element, index) {
           newmessage[index] = element.entry[0];
@@ -181,13 +182,15 @@ export default class MainChat extends Component {
   }
 
   render() {
+    let username = this.props.navigation.getParam("username");
     return (
       <View style={{ flex: 1 }}>
         <View style={styles.online_user_wrapper}>
           {this.state.onlineUsers.map((item, index) => {
             return (
-              <View>
+              <View key={item.uuid}>
                 <Image
+                  key={item.uuid}
                   style={styles.online_user_avatar}
                   source={{
                     uri: "https://robohash.org/" + item.uuid
@@ -201,11 +204,9 @@ export default class MainChat extends Component {
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
-            _id: this.props.navigation.getParam("username"),
-            name: this.props.navigation.getParam("username"),
-            avatar:
-              "https://robohash.org/" +
-              this.props.navigation.getParam("username")
+            _id: username,
+            name: username,
+            avatar: "https://robohash.org/" + username
           }}
         />
       </View>
