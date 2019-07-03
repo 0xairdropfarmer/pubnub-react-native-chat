@@ -5,7 +5,7 @@
  * @format
  * @flow
  */
-import { Card } from "react-native-elements";
+import _ from "lodash";
 import PubNubReact from "pubnub-react";
 import React, { Component } from "react";
 import { StyleSheet, Image, Button, FlatList, Text, View } from "react-native";
@@ -15,6 +15,7 @@ export default class MainChat extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isTyping: false,
       messages: [],
       onlineUsers: [],
       onlineUsersCount: 0
@@ -31,7 +32,8 @@ export default class MainChat extends Component {
 
   static navigationOptions = ({ navigation }) => {
     return {
-      headerTitle: navigation.getParam("onlineUsersCount") + " member online",
+      headerTitle:
+        navigation.getParam("onlineUsersCount", "No") + " member online",
       headerLeft: null,
       headerRight: (
         <Button
@@ -88,6 +90,7 @@ export default class MainChat extends Component {
       channel: RoomName
     });
   }
+
   PresenceStatus = () => {
     this.pubnub.getPresence(RoomName, presence => {
       if (presence.action === "join") {
@@ -168,22 +171,7 @@ export default class MainChat extends Component {
       }
     });
   };
-  hereNow = () => {
-    this.pubnub.hereNow(
-      {
-        channels: [RoomName],
-        includeUUIDs: true,
-        includeState: false
-      },
-      (status, response) => {
-        console.log(response.channels[RoomName].occupants);
-        this.setState({
-          onlineUsers: response.channels[RoomName].occupants,
-          onlineUsersCount: response.channels[RoomName].occupancy
-        });
-      }
-    );
-  };
+
   leaveChat = () => {
     this.pubnub.unsubscribe({ channels: [RoomName] });
     return this.props.navigation.navigate("Login");
@@ -213,7 +201,11 @@ export default class MainChat extends Component {
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
-            _id: this.props.navigation.getParam("username")
+            _id: this.props.navigation.getParam("username"),
+            name: this.props.navigation.getParam("username"),
+            avatar:
+              "https://robohash.org/" +
+              this.props.navigation.getParam("username")
           }}
         />
       </View>
