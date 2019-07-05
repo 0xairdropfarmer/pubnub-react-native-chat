@@ -15,7 +15,7 @@ export default class MainChat extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isTyping: false,
+      // isTyping: false,
       messages: [],
       onlineUsers: [],
       onlineUsersCount: 0
@@ -65,6 +65,7 @@ export default class MainChat extends Component {
     );
   }
   componentWillMount() {
+    console.log(this.props.navigation.getParam("username"));
     this.props.navigation.setParams({
       onlineUsersCount: this.state.onlineUsersCount,
       leaveChat: this.leaveChat.bind(this)
@@ -73,6 +74,11 @@ export default class MainChat extends Component {
       channels: [RoomName],
       withPresence: true
     });
+    // this.PubNub.state({
+    //   channel: [RoomName],
+    //   uuid: this.props.navigation.getParam("username"),
+    //   state: isTyping
+    // });
     this.pubnub.getMessage(RoomName, m => {
       this.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, m["message"])

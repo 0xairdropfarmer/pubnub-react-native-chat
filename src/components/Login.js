@@ -1,4 +1,10 @@
 import React, { Component } from "react";
+import Auth0 from "react-native-auth0";
+
+const auth0 = new Auth0({
+  domain: "kris101.auth0.com",
+  clientId: "SNA0RFXvxb_YYB3veYHYkgrYjb8XFRdb"
+});
 import {
   View,
   Text,
@@ -31,6 +37,24 @@ class Login extends Component {
       alert("username or password is incorrect");
     }
   }
+  Auth0Login = () => {
+    auth0.webAuth
+      .authorize({
+        scope: "openid email"
+      })
+      .then(res => {
+        console.log(res);
+        auth0.auth
+          .userInfo({ token: res.accessToken })
+          .then(user => {
+            this.props.navigation.navigate("MainChat", {
+              username: user.email
+            });
+          })
+          .catch(console.error);
+      })
+      .catch(error => console.log(error));
+  };
   render() {
     return (
       <View style={styles.container}>
@@ -61,6 +85,12 @@ class Login extends Component {
         <View style={styles.btnContiner}>
           <TouchableOpacity style={styles.btn} onPress={() => this.login()}>
             <Text style={styles.btntext}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => this.Auth0Login()}
+          >
+            <Text style={styles.btntext}>Login with Auth0</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -94,7 +124,8 @@ const styles = StyleSheet.create({
   btn: {
     backgroundColor: "orange",
     padding: 15,
-    width: "45%"
+    width: "45%",
+    marginLeft: 10
   },
   btntext: { fontSize: 16, textAlign: "center" },
   logo: {
