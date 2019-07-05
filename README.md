@@ -35,7 +35,22 @@ react-native run-ios
 ```sh
 npm run test
 ```
-
+## Todo
+- [X] [Basic setup with GiftedChat](https://www.pubnub.com/blog/building-a-chat-app-with-react-native-and-pubnub-part-one-messaging/)
+- [X] [Add Basic Auth and display history message by user](https://www.pubnub.com/blog/building-a-chat-app-with-react-native-and-pubnub-part-two-message-history/)
+- [X] Add online user count and avatar
+- [X] [Improve Auth with Auth0](https://imgur.com/a/lrhJwri)
+- [] Typing Indicator
+- [] one to one chat
+- [] unread message counts
+- [] Push Notifications
+- [] add emoji
+- [] send file and image also making preview 
+- [] sending location
+- [] Chatbot Integrations
+- [] Content Moderation with filter word 
+- [] Language Translation on the fly with AWS Translate
+- [] redesign UI baseon this [article](https://medium.com/@victorvarghese/building-facebook-messenger-clone-in-react-native-6d0f77bcd926)
 ## Author
 
 👤 **Krissanawat**
