@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Auth0 from "react-native-auth0";
-
+import AsyncStorage from "@react-native-community/async-storage";
+import OneSignal from "react-native-onesignal";
 const auth0 = new Auth0({
   domain: "kris101.auth0.com",
   clientId: "SNA0RFXvxb_YYB3veYHYkgrYjb8XFRdb"
@@ -55,6 +56,7 @@ class Login extends Component {
       })
       .catch(error => console.log(error));
   };
+
   render() {
     return (
       <View style={styles.container}>

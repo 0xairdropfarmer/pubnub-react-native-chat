@@ -1,7 +1,16 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/' } // Gradle Plugin Portal 
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.1, 0.99.99]'
+    }
+}
 
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -95,7 +104,7 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-
+buildToolsVersion '27.0.3'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -138,6 +147,8 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_async-storage')
+    implementation project(':react-native-onesignal')
     implementation project(':react-native-auth0')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-gesture-handler')

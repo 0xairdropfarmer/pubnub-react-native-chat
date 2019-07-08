@@ -5,11 +5,13 @@
  * @format
  * @flow
  */
-import _ from "lodash";
+import AsyncStorage from "@react-native-community/async-storage";
 import PubNubReact from "pubnub-react";
 import React, { Component } from "react";
 import { StyleSheet, Image, Button, FlatList, Text, View } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
+import OneSignal from "react-native-onesignal";
+
 const RoomName = "MainChat1";
 export default class MainChat extends Component {
   constructor(props) {
@@ -20,15 +22,30 @@ export default class MainChat extends Component {
       onlineUsers: [],
       onlineUsersCount: 0
     };
-
+    OneSignal.init("xxxxxxxxxxxxxxxxxxx");
+    OneSignal.addEventListener("received", this.onReceived);
+    OneSignal.addEventListener("opened", this.onOpened);
+    OneSignal.enableSound(true);
+    OneSignal.inFocusDisplaying(2);
+    OneSignal.configure();
     this.pubnub = new PubNubReact({
-      publishKey: "pub-c-5b74ec65-efe0-4be6-95f9-96b8167d7588",
-      subscribeKey: "sub-c-3f6e41aa-8609-11e9-98ee-ee7e7bd32b12",
+      publishKey: "xxxxxxxxxxxxxxxxxx",
+      subscribeKey: "xxxxxxxxxxxxxxxx",
       uuid: this.props.navigation.getParam("username"),
-      presenceTimeout: 10
+      presenceTimeout: 20
     });
     this.pubnub.init(this);
   }
+  onReceived = notification => {
+    console.log("Notification received: ", notification);
+  };
+
+  onOpened = openResult => {
+    console.log("Message: ", openResult.notification.payload.body);
+    console.log("Data: ", openResult.notification.payload.additionalData);
+    console.log("isActive: ", openResult.notification.isAppInFocus);
+    console.log("openResult: ", openResult);
+  };
 
   static navigationOptions = ({ navigation }) => {
     return {
@@ -46,11 +63,17 @@ export default class MainChat extends Component {
       )
     };
   };
+  getPushUserId = () => {
+    let userId = OneSignal.getPermissionSubscriptionState(data => {
+      return data.userId;
+    });
+    this.setState({ userId: userId });
+  };
   componentDidMount() {
     this.pubnub.history(
       { channel: RoomName, reverse: true, count: 15 },
       (status, res) => {
-        console.log(res);
+        console.log(status);
         let newmessage = [];
         res.messages.forEach(function(element, index) {
           newmessage[index] = element.entry[0];
@@ -64,12 +87,33 @@ export default class MainChat extends Component {
       }
     );
   }
+  sendNotification = data => {
+    let headers = {
+      "Content-Type": "application/json; charset=utf-8",
+      Authorization: "Basic xxxxxxxxxxxxxxxx"
+    };
+
+    let endpoint = "https://onesignal.com/api/v1/notifications";
+
+    let params = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        app_id: "xxxxxxxxxxxxxxxx",
+        included_segments: ["All"],
+        include_player_ids: this.state.userId,
+        priority: 10,
+        contents: { en: data }
+      })
+    };
+    fetch(endpoint, params).then(res => console.log(res));
+  };
   componentWillMount() {
-    console.log(this.props.navigation.getParam("username"));
     this.props.navigation.setParams({
       onlineUsersCount: this.state.onlineUsersCount,
       leaveChat: this.leaveChat.bind(this)
     });
+    this.getPushUserId();
     this.pubnub.subscribe({
       channels: [RoomName],
       withPresence: true
@@ -115,6 +159,7 @@ export default class MainChat extends Component {
         this.props.navigation.setParams({
           onlineUsersCount: this.state.onlineUsersCount
         });
+        this.sendNotification(presence.uuid + " join room");
       }
 
       if (presence.action === "leave" || presence.action === "timeout") {
@@ -125,7 +170,7 @@ export default class MainChat extends Component {
         this.setState({
           onlineUsers: leftUsers
         });
-
+        console.log("leave room");
         const length = this.state.onlineUsers.length;
         this.setState({
           onlineUsersCount: length
@@ -133,6 +178,7 @@ export default class MainChat extends Component {
         this.props.navigation.setParams({
           onlineUsersCount: this.state.onlineUsersCount
         });
+        this.sendNotification(presence.uuid + " leave room");
       }
 
       if (presence.action === "interval") {
@@ -158,6 +204,7 @@ export default class MainChat extends Component {
               onlineUsers.splice(onlineUsers.indexOf(leftUser), 1)
             );
             onlineUsersCount -= presence.leave.length;
+            console.log("leave room");
           }
 
           if (presence.timeout) {
@@ -184,6 +231,8 @@ export default class MainChat extends Component {
     return this.props.navigation.navigate("Login");
   };
   componentWillUnmount() {
+    OneSignal.removeEventListener("received", this.onReceived);
+    OneSignal.removeEventListener("opened", this.onOpened);
     this.leaveChat();
   }
 
@@ -243,7 +292,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     flexDirection: "row",
-    backgroundColor: "grey",
     flexWrap: "wrap"
   }
 });
