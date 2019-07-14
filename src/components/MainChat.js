@@ -5,13 +5,13 @@
  * @format
  * @flow
  */
-import AsyncStorage from "@react-native-community/async-storage";
 import PubNubReact from "pubnub-react";
 import React, { Component } from "react";
 import { StyleSheet, Image, Button, FlatList, Text, View } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
-import OneSignal from "react-native-onesignal";
-
+import AsyncStorage from "@react-native-community/async-storage";
+import _ from "lodash";
+import config from "./config";
 const RoomName = "MainChat1";
 export default class MainChat extends Component {
   constructor(props) {
@@ -20,33 +20,70 @@ export default class MainChat extends Component {
       // isTyping: false,
       messages: [],
       onlineUsers: [],
-      onlineUsersCount: 0
+      onlineUsersCount: 0,
+      isTyping: false,
+      whoTyping: []
     };
-    OneSignal.init("xxxxxxxxxxxxxxxxxxx");
-    OneSignal.addEventListener("received", this.onReceived);
-    OneSignal.addEventListener("opened", this.onOpened);
-    OneSignal.enableSound(true);
-    OneSignal.inFocusDisplaying(2);
-    OneSignal.configure();
     this.pubnub = new PubNubReact({
-      publishKey: "xxxxxxxxxxxxxxxxxx",
-      subscribeKey: "xxxxxxxxxxxxxxxx",
+      publishKey: config.pubnub_publishKey,
+      subscribeKey: config.pubnub_subscribeKey,
       uuid: this.props.navigation.getParam("username"),
-      presenceTimeout: 20
+      // logVerbosity: true
+      presenceTimeout: 60
     });
     this.pubnub.init(this);
+    this.detectTyping = this.detectTyping.bind(this);
   }
-  onReceived = notification => {
-    console.log("Notification received: ", notification);
+  getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("@loggedInUser");
+      if (value !== null) {
+        return value;
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
-
-  onOpened = openResult => {
-    console.log("Message: ", openResult.notification.payload.body);
-    console.log("Data: ", openResult.notification.payload.additionalData);
-    console.log("isActive: ", openResult.notification.isAppInFocus);
-    console.log("openResult: ", openResult);
+  detectTyping = text => {
+    if (text != "") this.init = true;
+    this.startTyping();
+    this.stopTyping();
   };
+  Typing = () => {
+    let self = this;
+    // this.init is fix as the indicator would run when the app mounts
+    this.init = false;
+    this.startTyping = _.debounce(() => {
+      if (!this.init) return;
+      this.PNState(true);
+    }, 1000);
 
+    this.stopTyping = _.debounce(() => {
+      if (!this.init) return;
+      this.PNState(false);
+    }, 4000);
+  };
+  PNState = state => {
+    let username = this.props.navigation.getParam("username");
+    this.pubnub.setState({
+      state: {
+        isTyping: state
+      },
+      uuid: username,
+      channels: [RoomName]
+    });
+  };
+  isTypingGif = () => {
+    console.log(this.state.isTyping);
+    if (this.state.isTyping) {
+      return (
+        <Image
+          style={{ position: "absolute", width: 50, height: 50 }}
+          source={require("../img/istyping.gif")}
+        />
+      );
+    }
+  };
   static navigationOptions = ({ navigation }) => {
     return {
       headerTitle:
@@ -63,12 +100,6 @@ export default class MainChat extends Component {
       )
     };
   };
-  getPushUserId = () => {
-    let userId = OneSignal.getPermissionSubscriptionState(data => {
-      return data.userId;
-    });
-    this.setState({ userId: userId });
-  };
   componentDidMount() {
     this.pubnub.history(
       { channel: RoomName, reverse: true, count: 15 },
@@ -79,50 +110,24 @@ export default class MainChat extends Component {
           newmessage[index] = element.entry[0];
         });
         this.setState(previousState => ({
-          messages: GiftedChat.append(
-            previousState.messages,
-            newmessage.reverse()
-          )
+          messages: GiftedChat.append(previousState.messages, newmessage)
         }));
       }
     );
+    this.PresenceStatus();
   }
-  sendNotification = data => {
-    let headers = {
-      "Content-Type": "application/json; charset=utf-8",
-      Authorization: "Basic xxxxxxxxxxxxxxxx"
-    };
 
-    let endpoint = "https://onesignal.com/api/v1/notifications";
-
-    let params = {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        app_id: "xxxxxxxxxxxxxxxx",
-        included_segments: ["All"],
-        include_player_ids: this.state.userId,
-        priority: 10,
-        contents: { en: data }
-      })
-    };
-    fetch(endpoint, params).then(res => console.log(res));
-  };
   componentWillMount() {
+    this.Typing();
     this.props.navigation.setParams({
       onlineUsersCount: this.state.onlineUsersCount,
       leaveChat: this.leaveChat.bind(this)
     });
-    this.getPushUserId();
+
     this.pubnub.subscribe({
       channels: [RoomName],
       withPresence: true
     });
-    // this.PubNub.state({
-    //   channel: [RoomName],
-    //   uuid: this.props.navigation.getParam("username"),
-    //   state: isTyping
-    // });
     this.pubnub.getMessage(RoomName, m => {
       this.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, m["message"])
@@ -130,7 +135,6 @@ export default class MainChat extends Component {
     });
 
     // this.hereNow();
-    this.PresenceStatus();
   }
   onSend(messages = []) {
     // this.setState(previousState => ({
@@ -144,6 +148,18 @@ export default class MainChat extends Component {
 
   PresenceStatus = () => {
     this.pubnub.getPresence(RoomName, presence => {
+      if (presence.action === "state-change") {
+        let typingIn = [];
+        if (presence.state.isTyping == true) {
+          typingIn.push({ uuid: presence.uuid });
+          this.setState({ whoTyping: typingIn });
+        } else {
+          let typingOut = typingIn.filter(
+            users => users.uuid !== presence.uuid
+          );
+          this.setState({ whoTyping: typingOut });
+        }
+      }
       if (presence.action === "join") {
         let users = this.state.onlineUsers;
 
@@ -151,7 +167,7 @@ export default class MainChat extends Component {
           state: presence.state,
           uuid: presence.uuid
         });
-
+        console.log("join room");
         this.setState({
           onlineUsers: users,
           onlineUsersCount: this.state.onlineUsersCount + 1
@@ -159,7 +175,6 @@ export default class MainChat extends Component {
         this.props.navigation.setParams({
           onlineUsersCount: this.state.onlineUsersCount
         });
-        this.sendNotification(presence.uuid + " join room");
       }
 
       if (presence.action === "leave" || presence.action === "timeout") {
@@ -178,15 +193,16 @@ export default class MainChat extends Component {
         this.props.navigation.setParams({
           onlineUsersCount: this.state.onlineUsersCount
         });
-        this.sendNotification(presence.uuid + " leave room");
       }
 
       if (presence.action === "interval") {
+        console.log("interval");
         if (presence.join || presence.leave || presence.timeout) {
           let onlineUsers = this.state.onlineUsers;
           let onlineUsersCount = this.state.onlineUsersCount;
 
           if (presence.join) {
+            console.log("join room at state");
             presence.join.map(
               user =>
                 user !== this.uuid &&
@@ -204,7 +220,7 @@ export default class MainChat extends Component {
               onlineUsers.splice(onlineUsers.indexOf(leftUser), 1)
             );
             onlineUsersCount -= presence.leave.length;
-            console.log("leave room");
+            console.log("leave room at state");
           }
 
           if (presence.timeout) {
@@ -231,8 +247,6 @@ export default class MainChat extends Component {
     return this.props.navigation.navigate("Login");
   };
   componentWillUnmount() {
-    OneSignal.removeEventListener("received", this.onReceived);
-    OneSignal.removeEventListener("opened", this.onOpened);
     this.leaveChat();
   }
 
@@ -243,7 +257,18 @@ export default class MainChat extends Component {
         <View style={styles.online_user_wrapper}>
           {this.state.onlineUsers.map((item, index) => {
             return (
-              <View key={item.uuid}>
+              <View key={item.uuid} style={styles.avatar_wrapper}>
+                {this.state.whoTyping.map((data, index) => {
+                  if (data.uuid == item.uuid && data.uuid != username) {
+                    return (
+                      <Image
+                        key={item.uuid}
+                        style={styles.istyping_gif}
+                        source={require("../img/istyping.gif")}
+                      />
+                    );
+                  }
+                })}
                 <Image
                   key={item.uuid}
                   style={styles.online_user_avatar}
@@ -258,6 +283,7 @@ export default class MainChat extends Component {
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
+          onInputTextChanged={this.detectTyping}
           user={{
             _id: username,
             name: username,
@@ -287,11 +313,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
     margin: 10
   },
+  footerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f7bb64"
+  },
+  footerText: {
+    fontSize: 12,
+    textAlign: "center",
+    margin: 10
+  },
   online_user_wrapper: {
     height: "8%",
-    justifyContent: "flex-end",
     alignItems: "center",
     flexDirection: "row",
-    flexWrap: "wrap"
+    justifyContent: "flex-end"
+  },
+  avatar_wrapper: {},
+  istyping_gif: {
+    position: "absolute",
+    left: 20,
+    height: 30,
+    width: 30
+    // justifyContent: "flex-end"
   }
 });

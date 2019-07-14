@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Auth0 from "react-native-auth0";
 import AsyncStorage from "@react-native-community/async-storage";
-import OneSignal from "react-native-onesignal";
 const auth0 = new Auth0({
   domain: "kris101.auth0.com",
   clientId: "SNA0RFXvxb_YYB3veYHYkgrYjb8XFRdb"
@@ -19,7 +18,10 @@ const user = {
   1: { username: "user2", password: 1111 }
 };
 class Login extends Component {
-  state = { username: "", password: "" };
+  state = {
+    username: "",
+    password: ""
+  };
   register() {
     return this.props.navigation.navigate("Register");
   }
@@ -30,6 +32,8 @@ class Login extends Component {
       (user[1].username == this.state.username &&
         user[1].password == this.state.password)
     ) {
+      // console.log("cc");
+
       this.props.navigation.navigate("MainChat", {
         username: this.state.username
       });
@@ -38,6 +42,13 @@ class Login extends Component {
       alert("username or password is incorrect");
     }
   }
+  storeData = async data => {
+    try {
+      await AsyncStorage.setItem("@loggedInUser", data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   Auth0Login = () => {
     auth0.webAuth
       .authorize({
@@ -48,7 +59,7 @@ class Login extends Component {
         auth0.auth
           .userInfo({ token: res.accessToken })
           .then(user => {
-            this.props.navigation.navigate("MainChat", {
+            this.props.navigation.navigate("PhoneInput", {
               username: user.email
             });
           })
