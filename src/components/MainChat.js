@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import _ from "lodash";
 import config from "./config";
 const RoomName = "MainChat1";
+const StateChannel = RoomName + "state-channel";
 export default class MainChat extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +30,7 @@ export default class MainChat extends Component {
       subscribeKey: config.pubnub_subscribeKey,
       uuid: this.props.navigation.getParam("username"),
       // logVerbosity: true
-      presenceTimeout: 60
+      presenceTimeout: 10
     });
     this.pubnub.init(this);
     this.detectTyping = this.detectTyping.bind(this);
@@ -65,13 +66,46 @@ export default class MainChat extends Component {
   };
   PNState = state => {
     let username = this.props.navigation.getParam("username");
-    this.pubnub.setState({
-      state: {
-        isTyping: state
+    this.pubnub.publish(
+      {
+        message: { username: username, isTyping: state },
+        channel: StateChannel,
+        storeInHistory: false
       },
-      uuid: username,
-      channels: [RoomName]
+      function(status, response) {
+        console.log(response);
+      }
+    );
+  };
+  getTypingState = () => {
+    this.pubnub.subscribe({
+      channels: [StateChannel],
+      withPresence: true
     });
+
+    this.pubnub.getMessage(StateChannel, messages => {
+      console.log(messages.message);
+      let typingIn = [];
+      if (messages.message.isTyping == true) {
+        typingIn.push({ uuid: messages.message.username });
+        this.setState({ whoTyping: typingIn });
+        console.log(this.state.whoTyping);
+      } else {
+        let typingOut = typingIn.filter(
+          users => users.uuid !== messages.message.username
+        );
+        this.setState({ whoTyping: typingOut });
+        console.log(this.state.whoTyping);
+      }
+    });
+
+    // if (presence.state.isTyping == true) {
+    //   typingIn.push({ uuid: presence.uuid });
+    //   this.setState({ whoTyping: typingIn });
+    // } else {
+    //   let typingOut = typingIn.filter(users => users.uuid !== presence.uuid);
+    //   this.setState({ whoTyping: typingOut });
+    // }
   };
   isTypingGif = () => {
     console.log(this.state.isTyping);
@@ -101,6 +135,14 @@ export default class MainChat extends Component {
     };
   };
   componentDidMount() {
+    this.getTypingState();
+    this.pubnub.subscribe({
+      channels: [RoomName + "state-channel"],
+      withPresence: true
+    });
+    this.pubnub.getMessage(RoomName + "state-channel", m => {
+      console.log(m["message"]);
+    });
     this.pubnub.history(
       { channel: RoomName, reverse: true, count: 15 },
       (status, res) => {
@@ -148,18 +190,6 @@ export default class MainChat extends Component {
 
   PresenceStatus = () => {
     this.pubnub.getPresence(RoomName, presence => {
-      if (presence.action === "state-change") {
-        let typingIn = [];
-        if (presence.state.isTyping == true) {
-          typingIn.push({ uuid: presence.uuid });
-          this.setState({ whoTyping: typingIn });
-        } else {
-          let typingOut = typingIn.filter(
-            users => users.uuid !== presence.uuid
-          );
-          this.setState({ whoTyping: typingOut });
-        }
-      }
       if (presence.action === "join") {
         let users = this.state.onlineUsers;
 

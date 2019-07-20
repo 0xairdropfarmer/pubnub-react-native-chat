@@ -11,12 +11,11 @@ class OTPVerfication extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      phone: null
+      phone_number: null
     };
   }
   sendOtp = code => {
     let phone_number = this.props.navigation.getParam("phone_number");
-    console.log(phone_number);
     fetch("https://api.ringcaptcha.com/1igu6onu8ite2aza8eda/verify", {
       method: "POST",
       headers: {
@@ -41,12 +40,14 @@ class OTPVerfication extends Component {
           style={styles.input}
           placeholder="_ _ _ _ _"
           keyboardType={"numeric"}
-          onChangeText={code => this.setState({ code: code })}
+          onChangeText={phone_number =>
+            this.setState({ phone_number: phone_number })
+          }
         />
         <View style={styles.btnContiner}>
           <TouchableOpacity
             style={styles.btn}
-            onPress={() => this.sendOtp(this.state.phone)}
+            onPress={() => this.sendOtp(this.state.phone_number)}
           >
             <Text style={styles.btntext}>Checking</Text>
           </TouchableOpacity>
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "90%",
-    backgroundColor: "skyblue",
+    backgroundColor: "grey",
     padding: 15,
     marginBottom: 10
   },

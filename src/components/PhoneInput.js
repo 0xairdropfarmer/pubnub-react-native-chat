@@ -7,18 +7,16 @@ import {
   TextInput
 } from "react-native";
 
-import Phone from "react-native-phone-input";
-
 class PhoneInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      phone: null
+      phone_number: null
     };
   }
-  componentDidMount() {
-    const { navigation } = this.props.navigation;
-  }
+  static navigationOptions = {
+    header: null
+  };
   sendOtp = phone_number => {
     fetch("https://api.ringcaptcha.com/1igu6onu8ite2aza8eda/code/sms", {
       method: "POST",
@@ -26,11 +24,11 @@ class PhoneInput extends Component {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      body: `phone=+66844848584&api_key=d3fb699623fdde7ba6ee8d010893edfe02c01f3c`
+      body: `phone=${phone_number}&api_key=d3fb699623fdde7ba6ee8d010893edfe02c01f3c`
     }).then(res => {
       alert("OTP will delivery soon checking in next screen");
       this.props.navigation.navigate("OTPVerfication", {
-        phone_number: "+66844848584",
+        phone_number: phone_number,
         username: this.props.navigation.getParam("username")
       });
     });
@@ -45,12 +43,14 @@ class PhoneInput extends Component {
         <TextInput
           style={styles.input}
           placeholder="input phone number"
-          onChangeText={phone => this.setState({ phone: phone })}
+          onChangeText={phone_number =>
+            this.setState({ phone_number: phone_number })
+          }
         />
         <View style={styles.btnContiner}>
           <TouchableOpacity
             style={styles.btn}
-            onPress={() => this.sendOtp(this.state.phone)}
+            onPress={() => this.sendOtp(this.state.phone_number)}
           >
             <Text style={styles.btntext}>Send OTP</Text>
           </TouchableOpacity>
