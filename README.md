@@ -62,5 +62,4 @@ npm run test
 
 Give a ⭐️ if this project helped you!
 
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+<img src="https://d2c805weuec6z7.cloudfront.net/Powered_By_PubNub.png" alt="Powered By PubNub" width="200"></a>
